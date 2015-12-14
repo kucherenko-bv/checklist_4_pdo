@@ -1,7 +1,12 @@
 <?php
+/*
+spl_autoload_register(function ($class) {
+    include 'vendor_2/'.$class . '.class.php';
+});
+*/
 
 spl_autoload_register(function ($class) {
-    include 'vendor/'.$class . '.class.php';
+include $class.'.php';
 });
 
 
@@ -13,27 +18,25 @@ $dsn ='mysql:host='.DB_HOST.';dbname='.DB_NAME;
 
 $table_name = 'table_test';
 
-
+/*
 $singleton_db = new singleton_db($dsn, DB_USER, DB_PASS, array());
 $singleton_db->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );  //Error Handling
-
-if(tableExists($singleton_db, $table_name) == false){
-
-    $sql ="CREATE table $table_name(
-     ID INT( 11 ) AUTO_INCREMENT PRIMARY KEY,
-     Name VARCHAR( 250 ) NOT NULL,
-     Param1 VARCHAR( 150 ) NOT NULL,
-     Param2 VARCHAR( 150 ) NOT NULL,
-     Param3 VARCHAR( 150 ) NOT NULL);";
-    $singleton_db->exec($sql);
-
-    $singleton_db->exec("INSERT INTO $table_name (Name, Param1, Param2, Param3) VALUES ('Singleton PDO', '1', '2', '3')");
-
-    print("Table $table_name was created.\n");
-}
-else print("Table $table_name exist.\n");
-
+$singleton_db->exec("INSERT INTO $table_name (Name, Param1, Param2, Param3) VALUES ('Singleton PDO 2', '1', '2', '3')");
+print("Table $table_name was created.\n");
 print_r($singleton_db->queryFetchAllAssoc("SELECT * from table_test")[0]);
+*/
+
+
+$DBConnection = new DBConnection;
+$pdo = $DBConnection->connect('mysql:host=localhost;dbname=pdo','root','root');
+$DBConnection->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );  //Error Handling
+
+$DBQuerry = new DBQuery($DBConnection);
+
+
+//$DBQuerry->execute("INSERT INTO $table_name (Name, Param1, Param2, Param3) VALUES ('Singleton PDO 3', '1', '2', '3')");
+
+print_r($DBQuerry->query("SELECT * from table_test"));
 
 
 
