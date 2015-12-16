@@ -1,63 +1,45 @@
 <?php
-/*
-spl_autoload_register(function ($class) {
-    include 'vendor_2/'.$class . '.class.php';
-});
-*/
 
 spl_autoload_register(function ($class) {
-include $class.'.php';
+    include $class.'.php';
 });
 
+//define('DB_HOST','localhost');
+//define('DB_NAME','pdo');
+//define('DB_USER','root');
+//define('DB_PASS','root');
+//$dsn ='mysql:host='.DB_HOST.';dbname='.DB_NAME;
 
-define('DB_HOST','localhost');
-define('DB_NAME','pdo');
-define('DB_USER','root');
-define('DB_PASS','root');
-$dsn ='mysql:host='.DB_HOST.';dbname='.DB_NAME;
-
-$table_name = 'table_test';
-
-/*
-$singleton_db = new singleton_db($dsn, DB_USER, DB_PASS, array());
-$singleton_db->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );  //Error Handling
-$singleton_db->exec("INSERT INTO $table_name (Name, Param1, Param2, Param3) VALUES ('Singleton PDO 2', '1', '2', '3')");
-print("Table $table_name was created.\n");
-print_r($singleton_db->queryFetchAllAssoc("SELECT * from table_test")[0]);
-*/
-
-
-$DBConnection = new DBConnection;
+$DBConnection = new DBConnection();
 $pdo = $DBConnection->connect('mysql:host=localhost;dbname=pdo','root','root');
 $DBConnection->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );  //Error Handling
+//$DBConnection->setAttribute(PDO::ATTR_EMULATE_PREPARES,TRUE);
+
+//print_r($DBConnection->getLastInsertID());
 
 $DBQuerry = new DBQuery($DBConnection);
 
-
-//$DBQuerry->execute("INSERT INTO $table_name (Name, Param1, Param2, Param3) VALUES ('Singleton PDO 3', '1', '2', '3')");
-
-print_r($DBQuerry->query("SELECT * from table_test"));
-
-
-
-
-/**
- * Check if a table exists in the current database.
- *
- * @param PDO $singleton_db PDO instance connected to a database.
- * @param string $table_name Table to search for.
- * @return bool TRUE if table exists, FALSE if no table found.
- */
-function tableExists($singleton_db, $table_name) {
-
-    // Try a select statement against the table
-    // Run it in try/catch in case PDO is in ERRMODE_EXCEPTION.
-    try {
-        $singleton_db->query("SELECT 1 FROM $table_name LIMIT 1");
-    } catch (Exception $e) {
-        // We got an exception == table not found
-        return FALSE;
-    }
-    // Result is either boolean FALSE (no table found) or PDOStatement Object (table found)
-    return true;
+if ($DBQuerry->tableExists('pdotable')==false){
+    $DBQuerry->query("CREATE table pdotable(
+     ID INT( 11 ) AUTO_INCREMENT PRIMARY KEY,
+     Name VARCHAR( 250 ) NOT NULL,
+     Param1 VARCHAR( 150 ) NOT NULL,
+     Param2 VARCHAR( 150 ) NOT NULL,
+     Param3 VARCHAR( 150 ) NOT NULL);");
+    $DBQuerry->query("INSERT INTO pdotable (Name, Param1, Param2, Param3) VALUES ('Name1', '1', '2', '3')");
+    $DBQuerry->query("INSERT INTO pdotable (Name, Param1, Param2, Param3) VALUES ('Name1', '4', '5', '6')");
+    $DBQuerry->query("INSERT INTO pdotable (Name, Param1, Param2, Param3) VALUES ('Name1', '7', '8', '9')");
+    $DBQuerry->query("INSERT INTO pdotable (Name, Param1, Param2, Param3) VALUES ('Name1', '10', '11', '12')");
+    $DBQuerry->query("INSERT INTO pdotable (Name, Param1, Param2, Param3) VALUES ('Name1', '13', '14', '15')");
+    $DBQuerry->query("INSERT INTO pdotable (Name, Param1, Param2, Param3) VALUES ('Name2', '16', '17', '18')");
+    var_dump($pdo->lastInsertId('pdotable'));
 }
+
+//print_r($DBQuerry->execute('SELECT Param1, Param2, Param3 FROM mytable WHERE name = :var_name', $params = [':var_name' => 'Name3'] ));
+//print_r($DBQuerry->queryAll('SELECT Param1, Param2, Param3 FROM mytable WHERE name = :var_name', $params = [':var_name' => 'Name3'] ));
+//print_r($DBQuerry->queryRow('SELECT Param1, Param2, Param3 FROM mytable WHERE name = :var_name', $params = [':var_name' => 'Name3'] ));
+//print_r($DBQuerry->queryColumn('SELECT Param1, Param2, Param3 FROM mytable WHERE name = :var_name', $params = [':var_name' => 'Name3'] ));
+//print_r($DBQuerry->queryScalar('SELECT Param1, Param2, Param3 FROM mytable WHERE name = :var_name', $params = [':var_name' => 'Name3'] ));
+//print_r($DBQuerry->getLastQueryTime());
+
+var_dump($pdo->lastInsertId('pdotable'));

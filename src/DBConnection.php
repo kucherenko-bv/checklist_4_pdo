@@ -2,10 +2,11 @@
 
 class DBConnection implements DBConnectionInterface
 {
-    /**
-     * @var PDO
-     */
+
     static private $PDOInstance;
+    //private $dsn;
+    //private $username;
+    //private $password;
 
     /**
      * Creates new instance representing a connection to a database
@@ -35,7 +36,7 @@ class DBConnection implements DBConnectionInterface
      * @return void
      */
     public function reconnect(){
-        self::$PDOInstance = null;
+        $this->close();
     }
 
     /**
@@ -44,9 +45,7 @@ class DBConnection implements DBConnectionInterface
      * @return PDO the PDO instance, null if the connection is not established yet
      */
     public function getPdoInstance(){
-        if(self::$PDOInstance) {
-           return self::$PDOInstance;
-        }
+        if(self::$PDOInstance) return self::$PDOInstance;
         else return null;
     }
 
