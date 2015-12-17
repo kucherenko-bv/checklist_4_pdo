@@ -1,5 +1,7 @@
 <?php
 
+require __DIR__  . '/DBQueryInterface.php';
+
 class DBQuery implements DBQueryInterface
 {
 
@@ -49,19 +51,14 @@ class DBQuery implements DBQueryInterface
         try {
             $this->getDBConnection()->query('set profiling=1');
             $sth = $this->getDBConnection()->prepare($query);
-            if ($params != null){
-                foreach($params as $k=>$v){
-                    $sth->bindParam($k, $v);
-                }
-            }
-            $sth->execute();
-            $this->getDBConnection()->query('set profiling=0');
+            $sth->execute($params);
             return $sth;
         } catch (Exception $e) {
             echo 'Error: ',  $e->getMessage(), "\n";
             return false;
         }
     }
+
 
     /**
      * Executes the SQL statement and returns all rows of a result set as an associative array
@@ -101,6 +98,7 @@ class DBQuery implements DBQueryInterface
      */
     public function queryColumn($query, array $params = null){
         $var = $this->query($query, $params);
+        $res = array();
         if($var !=false){
             foreach ($var->fetchAll(PDO::FETCH_NUM) as $arr) {
                 $res[] = $arr[0];
@@ -136,7 +134,7 @@ class DBQuery implements DBQueryInterface
      * @return integer number of rows affected by the execution.
      */
     public function execute($query, array $params = null){
-        return $this->query($query, $params)->execute();
+        return $this->query($query, $params)->rowCount();
     }
 
 

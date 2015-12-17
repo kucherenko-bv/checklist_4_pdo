@@ -1,12 +1,17 @@
 <?php
 
-class DBConnection implements DBConnectionInterface
-{
+require __DIR__  . '/DBConnectionInterface.php';
 
+class DB implements DBConnectionInterface
+{
+    /**
+     * @var PDO
+     */
     static private $PDOInstance;
-    //private $dsn;
-    //private $username;
-    //private $password;
+
+    static private $p_dsn;
+    static private $p_username;
+    static private $p_password;
 
     /**
      * Creates new instance representing a connection to a database
@@ -20,14 +25,18 @@ class DBConnection implements DBConnectionInterface
      * @return $this DB
      */
     public static function connect($dsn, $username = '', $password = ''){
+        self::$p_dsn = $dsn;
+        self::$p_username = $username;
+        self::$p_password = $password;
+
         if(!self::$PDOInstance) {
             try {
-                self::$PDOInstance = new PDO($dsn, $username, $password);
+                self::$PDOInstance = new PDO(self::$p_dsn, self::$p_username, self::$p_password);
             } catch (PDOException $e) {
                 die("PDO CONNECTION ERROR: " . $e->getMessage() . "<br/>");
             }
         }
-        return self::$PDOInstance;
+        return new self;
     }
 
     /**
@@ -36,7 +45,7 @@ class DBConnection implements DBConnectionInterface
      * @return void
      */
     public function reconnect(){
-        $this->close();
+        $this->connect(self::$p_dsn, self::$p_username, self::$p_password );
     }
 
     /**
