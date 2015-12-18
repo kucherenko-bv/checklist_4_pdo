@@ -1,4 +1,11 @@
 <?php
+/**
+ * Created by PhpStorm.
+ * User: kucherenko_bv
+ * Date: 18.12.2015
+ * Time: 11:16
+ * Version: 1.0
+ */
 
 require __DIR__  . '/DBConnectionInterface.php';
 
