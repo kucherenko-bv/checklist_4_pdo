@@ -1,13 +1,12 @@
 {
-    "require": {
-        "php":">=5.3.0",
-        "kucherenko-bv/checklist_4_pdo":"*"
-        
+    "name":"kucherenko-bv/checklist_4_pdo",
+    "version":"1.0",
+    "require":{
+        "php":">=5.3.0"
     },
-    "repositories":[
-        {
-            "type":"git",
-            "url":"https://github.com/kucherenko-bv/checklist_4_pdo"
+    "autoload":{
+        "psr-4":{
+            "SingleNamespace":""
         }
-    ]
+    }
 }
