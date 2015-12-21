@@ -16,7 +16,7 @@
     },
     "autoload":{
         "psr-4":{
-            "SingleNamespace":"SingleNamespace"
+            "SingleNamespace\\":"src/"
         }
     },
     "minimum-stability": "stable"
