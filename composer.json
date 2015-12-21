@@ -16,7 +16,7 @@
     },
     "autoload":{
         "psr-4":{
-            "SingleNamespace\\":"src/"
+            "SingleNamespace\\":"SingleNamespace/"
         }
     },
     "repositories":[
