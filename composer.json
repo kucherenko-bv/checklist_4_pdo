@@ -18,6 +18,7 @@
         "psr-4":{
             "SingleNamespace\\":"src/"
         }
-    }
+    },
+    "minimum-stability": "dev"
 
 }
