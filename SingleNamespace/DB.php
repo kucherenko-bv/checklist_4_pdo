@@ -7,6 +7,11 @@
  * Version: 1.0
  */
 
+namespace SingleNamespace;
+use DBConnectionInterface;
+use PDO;
+use PDOException;
+
 require __DIR__  . '/DBConnectionInterface.php';
 
 class DB implements DBConnectionInterface

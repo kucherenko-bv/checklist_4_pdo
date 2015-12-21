@@ -7,6 +7,12 @@
  * Version: 1.0
  */
 
+namespace SingleNamespace;
+use DBConnectionInterface;
+use DBQueryInterface;
+use PDO;
+use Exception;
+
 require __DIR__  . '/DBQueryInterface.php';
 
 class DBQuery implements DBQueryInterface
