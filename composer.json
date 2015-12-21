@@ -16,7 +16,7 @@
     },
     "autoload":{
         "psr-4":{
-            "SingleNamespace\\":"src/"
+            "kucherenko-bv\\checklist_4_pdo\\SingleNamespace\\":"src/"
         }
     },
     "repositories":[
