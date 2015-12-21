@@ -19,6 +19,12 @@
             "SingleNamespace\\":"src/"
         }
     },
+    "repositories":[
+        {
+            "type":"git",
+            "url":"https://github.com/kucherenko-bv/checklist_4_pdo"
+        }
+    ],
     "minimum-stability": "dev"
 
 }
