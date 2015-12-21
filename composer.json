@@ -22,7 +22,7 @@
     "repositories":[
         {
             "type":"git",
-            "url":"https://github.com/kucherenko-bv/checklist_4_pdo"
+            "url":"https://github.com/kucherenko-bv/checklist_4_pdo.git"
         }
     ],
     "minimum-stability": "dev"
