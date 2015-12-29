@@ -8,6 +8,7 @@
  */
 
 namespace SingleNamespace;
+
 use DBConnectionInterface;
 use PDO;
 use PDOException;
@@ -19,14 +20,17 @@ class DB implements DBConnectionInterface
     /**
      * @var PDO
      */
-    static private $PDOInstance;
 
-    static private $p_dsn;
-    static private $p_username;
-    static private $p_password;
+    static private $Singleton;  // Instance of DB class
+    static private $InstanceArr = array();  // Array of DB class instances
+
+    private $conParam = array();    // Array of connection parameters
+    private $PDOInstance;   // PDO instance
 
     /**
      * Creates new instance representing a connection to a database
+     * For one user there isn't more than one conection to a database.
+     *
      * @param string $dsn The Data Source Name, or DSN, contains the information required to connect to the database.
      *
      * @param string $username The user name for the DSN string.
@@ -36,19 +40,37 @@ class DB implements DBConnectionInterface
      *
      * @return $this DB
      */
-    public static function connect($dsn, $username = '', $password = ''){
-        self::$p_dsn = $dsn;
-        self::$p_username = $username;
-        self::$p_password = $password;
-
-        if(!self::$PDOInstance) {
+    public static function connect($dsn, $username = '', $password = '')
+    {
+        $conHash = self::currentConnectionHash($dsn, $username);
+        if(array_key_exists($conHash, self::$InstanceArr)) {
+            self::$Singleton = self::$InstanceArr[$conHash];
+            return self::$Singleton;
+        } else {
             try {
-                self::$PDOInstance = new PDO(self::$p_dsn, self::$p_username, self::$p_password);
+                self::$Singleton = new self;
+                self::$Singleton->PDOInstance = new PDO($dsn, $username, $password);
+                self::$Singleton->conParam = ['dsn' => $dsn, 'username' => $username, 'pass' => $password];
+                self::$InstanceArr[$conHash] = self::$Singleton;
+                return  self::$Singleton;
             } catch (PDOException $e) {
-                die("PDO CONNECTION ERROR: " . $e->getMessage() . "<br/>");
+                print("PDO CONNECTION ERROR: " . $e->getMessage() . "<br/>");
+                throw $e;
             }
         }
-        return new self;
+    }
+
+    /**
+     * Save hash of current dsn and username
+     *
+     * @param string $dsn The Data Source Name, or DSN, contains the information required to connect to the database.
+     * @param string $username The user name for the DSN string.
+     *
+     * @return $this->currentConnectionHash
+     */
+    private function currentConnectionHash($dsn, $username = '')
+    {
+        return hash('md5',$username.$dsn);
     }
 
     /**
@@ -56,8 +78,25 @@ class DB implements DBConnectionInterface
      *
      * @return void
      */
-    public function reconnect(){
-        $this->connect(self::$p_dsn, self::$p_username, self::$p_password );
+    public function reconnect()
+    {
+        $this->close();
+        try {
+            $this->PDOInstance = new PDO ($this->conParam['dsn'], $this->conParam['username'], $this->conParam['pass']);
+        } catch (PDOException $e) {
+            print("PDO CONNECTION ERROR: " . $e->getMessage() . "<br/>");
+        }
+    }
+
+    /**
+     * Protection from cloning.
+     * Can be empty.
+     *
+     * @return void
+     */
+    private function __clone()
+    {
+
     }
 
     /**
@@ -65,9 +104,13 @@ class DB implements DBConnectionInterface
      *
      * @return PDO the PDO instance, null if the connection is not established yet
      */
-    public function getPdoInstance(){
-        if(self::$PDOInstance) return self::$PDOInstance;
-        else return null;
+    public function getPdoInstance()
+    {
+        if($this->PDOInstance) {
+            return $this->PDOInstance;
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -78,8 +121,9 @@ class DB implements DBConnectionInterface
      * @return string the row ID of the last row inserted, or the last value retrieved from the sequence object
      * @see http://www.php.net/manual/en/function.PDO-lastInsertId.php
      */
-    public function getLastInsertID($sequenceName = ''){
-        return self::$PDOInstance->lastInsertId($sequenceName);
+    public function getLastInsertID($sequenceName = '')
+    {
+        return $this->getPdoInstance()->lastInsertId($sequenceName);
     }
 
     /**
@@ -88,9 +132,10 @@ class DB implements DBConnectionInterface
      *
      * @return void
      */
-    public function close(){
-        if(self::$PDOInstance) {
-            self::$PDOInstance = null;
+    public function close()
+    {
+        if($this->PDOInstance) {
+            $this->PDOInstance = null;
         }
     }
 
@@ -105,8 +150,9 @@ class DB implements DBConnectionInterface
      * @return bool
      * @see http://php.net/manual/en/pdo.setattribute.php
      */
-    public function setAttribute($attribute, $value){
-       return self::$PDOInstance->setAttribute($attribute, $value);
+    public function setAttribute($attribute, $value)
+    {
+       return $this->getPdoInstance()->setAttribute($attribute, $value);
     }
 
     /**
@@ -117,7 +163,19 @@ class DB implements DBConnectionInterface
      * @return mixed
      * @see http://php.net/manual/en/pdo.setattribute.php
      */
-    public function getAttribute($attribute){
-        return self::$PDOInstance->getAttribute($attribute);
+    public function getAttribute($attribute)
+    {
+        return $this->getPdoInstance()->getAttribute($attribute);
     }
+
+    /**
+     * Close connection.
+     *
+     * @return void
+     */
+    public function __destruct()
+    {
+        $this->close();
+    }
+
 }
